@@ -1,0 +1,135 @@
+
+CREATE TABLE Dim_Customer (
+    Customer_id char(5) PRIMARY KEY,
+    First_name nVARCHAR(20),
+    Last_name nVARCHAR(20),
+    Birthday DATE,
+    Gender nvarchar(5),
+    Email VARCHAR(50),
+    Password VARCHAR(20),
+    Street nVARCHAR(30),
+    City nVARCHAR(30),
+    Province nVARCHAR(30),
+    Created_at DATE,
+    Phone_number VARCHAR(15),
+    Category_name VARCHAR(15),
+    Ratio_discount float
+);
+alter table Dim_customer
+add customer_Category_id char(5)
+
+CREATE TABLE Dim_Time (
+    Time_id char(5) PRIMARY KEY,
+    Date int,
+    Month INT,
+    Quarter char(2),
+    Year INT
+);
+
+CREATE TABLE Dim_Shipment (
+    Shipment_id char(6) PRIMARY KEY,
+    Shipment_name (20) char, 
+   Address_delivery nVARCHAR(25),
+    District_delivery nVARCHAR(25),
+    Province nVARCHAR(25),
+    Delivered_date DATE,
+    Canceled_date DATE,
+    Order_completed_date DATE,
+    Shipping_status VARCHAR(15)
+);
+
+CREATE TABLE Dim_Coupon (
+    Coupon_id char(5) PRIMARY KEY,
+    Coupon_name nVARCHAR(30),
+    Start_active DATE,
+    Expired_date DATE,
+    Ratio_offer float,
+    Condition_offer float,
+    Maximum_reduction float,
+    Quantity_Coupon INT
+);
+
+CREATE TABLE Dim_Product (
+    Product_id char(5) PRIMARY KEY,
+    Product_name nVARCHAR(40),
+    Size_product nVARCHAR(20),
+    Colour_product nVARCHAR(15),
+    Created_at DATE,
+    Product_category_name nVARCHAR(20),
+    Price float
+);
+alter table dim_product
+alter column product_name nvarchar(50)
+CREATE TABLE Dim_Cart (
+    Cart_id char(5) PRIMARY KEY,
+    Created_at DATE
+);
+
+CREATE TABLE Dim_Warehouse (
+    Warehouse_id char(5) PRIMARY KEY,
+    Warehouse_name nVARCHAR(25),
+	Location_placed nvarchar(30),
+    Capacity INT
+);
+
+-- Fact Tables
+CREATE TABLE Fact_Sale_orders (
+	Sugokey_sale_order int identity(1,1) primary key,
+    Order_id char(5) ,
+    Time_id char(5),
+    Customer_id char(5),
+    Product_id char(5),
+    Coupon_id char(5),
+    Shipment_id char(5),
+    Value_reduction float,
+    Quantity_purchase INT,
+	Total float,
+    FOREIGN KEY (Time_id) REFERENCES Dim_Time(Time_id),
+    FOREIGN KEY (Customer_id) REFERENCES Dim_Customer(Customer_id),
+    FOREIGN KEY (Product_id) REFERENCES Dim_Product(Product_id),
+    FOREIGN KEY (Coupon_id) REFERENCES Dim_Coupon(Coupon_id),
+    FOREIGN KEY (Shipment_id) REFERENCES Dim_Shipment(Shipment_id)
+);
+
+
+CREATE TABLE Fact_Review (
+	sugokey_Review int identity (1,1) primary key,
+    Review_id char(5),
+    Product_id char(5),
+    Customer_id char(5),
+    Time_id char(5),
+    Rating INT CHECK (Rating BETWEEN 1 AND 5),
+    FOREIGN KEY (Product_id) REFERENCES Dim_Product(Product_id),
+    FOREIGN KEY (Customer_id) REFERENCES Dim_Customer(Customer_id),
+    FOREIGN KEY (Time_id) REFERENCES Dim_Time(Time_id)
+);
+
+CREATE TABLE Fact_CartItem (
+	sugokey_cart int identity(1,1) primary key,
+	Cart_item_id char(5) ,
+    Cart_id char(5),
+	Customer_id char(5),
+    Product_id char(5),
+    Time_id char(5),
+    Quantity int,
+    Total_amount_cart float,
+	Status_item varchar(20)
+    FOREIGN KEY (Cart_id) REFERENCES Dim_Cart(Cart_id),
+	FOREIGN KEY (Customer_id) REFERENCES Dim_Customer(Customer_id),
+    FOREIGN KEY (Product_id) REFERENCES Dim_Product(Product_id),
+    FOREIGN KEY (Time_id) REFERENCES DIm_Time(Time_id)
+);
+
+CREATE TABLE Fact_inventory (
+	sugokey_inventory int identity(1,1) primary key,
+	inventory_id char(5),
+    Warehouse_id char(5),
+    Product_id char(5),
+    Time_id char(5),
+    Inventory_quantity INT,
+    FOREIGN KEY (Warehouse_id) REFERENCES dim_Warehouse(Warehouse_id),
+    FOREIGN KEY (Product_id) REFERENCES dim_Product(Product_id),
+    FOREIGN KEY (Time_id) REFERENCES dim_Time(Time_id)
+);
+
+
